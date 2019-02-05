@@ -1,0 +1,13 @@
+
+.form-control {
+  border: 1px solid #cccccc !important;
+}
+
+.form-control {
+  &:hover {
+    border: 1px solid #cccccc !important;
+  }
+  &:focus {
+    border: 1px solid #cccccc !important;
+  }
+}

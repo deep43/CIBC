@@ -1,0 +1,133 @@
+<div class="page-body">
+  <div class="row">
+    <div class="col-sm-12">
+      <app-card [title]="" [classHeader]="true">
+        <div class="row">
+          <div class="col-md-9">
+            <label class="float-left">
+              <label class="label label-inverse-info-border label-lg">Curreny Pair: <span
+                class="p-l-10">GBPEUR</span></label>
+              <label class="label label-inverse-info-border label-lg">
+                <i class="icofont icofont-exchange"></i>
+              </label>
+              <label class="label label-inverse-info-border label-lg">Trade Currency</label>
+            </label>
+          </div>
+            <div class="col-3 col-sm-1 p-r-0">
+              <label class="p-t-5">Search: </label>
+            </div>
+            <div class="col-7 col-sm-2 p-l-0">
+              <div class="form-group">
+                <input
+                  type='text'
+                  class="form-control input-sm"
+                  placeholder='Search Name'
+                  (keyup)='updateFilterTop($event)'
+                />
+              </div>
+            <!--<div class="col-md-3">
+              <label>Search: </label>
+            </div>
+            <div>
+              <label class="dt-cust-search float-right">
+                <div class="form-group">
+                  <input
+                    type='text'
+                    class="form-control input-sm m-l-10"
+                    placeholder='Search Name'
+                    (keyup)='updateFilterTop($event)'
+                  />
+                </div>
+              </label>
+            </div>-->
+          </div>
+        </div>
+        <ngx-datatable
+          #table
+          class='data-table'
+          [columns]="columns"
+          [columnMode]="'force'"
+          [scrollbarH]="true"
+          [headerHeight]="50"
+          [footerHeight]="50"
+          [rowHeight]="50"
+          [limit]="10"
+          [rows]='rowsFilterTop'>
+        </ngx-datatable>
+      </app-card>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <app-card [cardClass]="'tab-card'">
+        <div class="md-tabs">
+          <ngb-tabset (tabChange)="onClickTab()">
+            <ngb-tab title="Blotter">
+              <ng-template ngbTabContent>
+                <app-card [title]="" [classHeader]="true">
+                  <div class="row">
+                    <div class="col-3 col-sm-1 p-r-0">
+                      <label class="p-r-10 filter-on-mob p-t-5">Filter: </label>
+                    </div>
+                    <div class="col-7 col-sm-2 p-l-0 m-b-10">
+                      <select name="select" class="form-control form-control-inverse">
+                        <option value="MyTrades">My Trades</option>
+                        <option value="AllTrades">All Trades</option>
+                      </select>
+                    </div>
+                    <div class="col-2 col-sm-6"></div>
+                    <div class="col-3 col-sm-1 p-r-0">
+                      <label class="p-t-5">Search: </label>
+                    </div>
+                    <div class="col-7 col-sm-2 p-l-0">
+                      <div class="form-group">
+                        <input
+                          type='text'
+                          class="form-control input-sm"
+                          placeholder='Search Name'
+                          (keyup)='updateFilter($event)'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <ngx-datatable
+                    #table
+                    class='data-table'
+                    [columns]="columns"
+                    [columnMode]="'force'"
+                    [scrollbarH]="true"
+                    [headerHeight]="50"
+                    [footerHeight]="50"
+                    [rowHeight]="50"
+                    [limit]="10"
+                    [rows]='rowsFilter'>
+                  </ngx-datatable>
+                </app-card>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Trade Search">
+              <ng-template ngbTabContent>
+                <ngx-datatable
+                  #table
+                  class='data-table'
+                  [columns]="tradeColumns"
+                  [columnMode]="'force'"
+                  [scrollbarH]="true"
+                  [headerHeight]="50"
+                  [footerHeight]="50"
+                  [rowHeight]="50"
+                  [rowClass]="getRowClass"
+                  [limit]="10"
+                  [rows]='rowsTradeFilter'>
+                </ngx-datatable>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+      </app-card>
+
+
+    </div>
+
+  </div>
+</div>

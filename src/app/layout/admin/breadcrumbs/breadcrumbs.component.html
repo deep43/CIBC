@@ -1,0 +1,41 @@
+<div class="" *ngFor="let breadcrumb of breadcrumbs; let last = last">
+  <div class="page-header" *ngIf="breadcrumb.status && last">
+    <div class="page-block" *ngIf="last">
+      <div class="row align-items-center">
+        <div class="col-sm-4 col-md-2 breadcrumb-links">
+          <div class="page-header-title">
+            <span *ngFor="let breadcrumb of breadcrumbs; let last = last"><h4 *ngIf="last" class="m-b-10">{{ breadcrumb.label }}</h4></span>
+            <!--<p class="m-b-0" *ngIf="breadcrumb.caption">{{ breadcrumb.caption }}</p>-->
+          </div>
+          <ul class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/dashboard/default/']">
+                <i class="feather icon-home"></i>
+              </a>
+            </li>
+            <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs;">
+              <a [ngClass]="breadcrumb.status === false ? 'not-active': ''" [routerLink]="breadcrumb.url">{{breadcrumb.label}}</a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-sm-8 col-md-8 col-xs-8 top-selects">
+          <select name="select" class="form-control form-control-inverse m-r-20">
+            <option value="opt5">Blackstone Solar</option>
+            <option value="opt1">Entity</option>
+            <option value="opt2">5N Plus</option>
+            <option value="opt3">Atlantic Power</option>
+            <option value="opt4">Blackstone Energy Services Inc.</option>
+            <option value="opt6">Carmanah Technologies</option>
+            <option value="opt7">Polaris Infrastructure</option>
+            <option value="opt8">Synex International</option>
+          </select>
+          <select name="select" class="form-control form-control-inverse">
+            <option value="opt1">Workspace</option>
+            <option value="opt2">Workspace 1</option>
+            <option value="opt3">Workspace 2</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

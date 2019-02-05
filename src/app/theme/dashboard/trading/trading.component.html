@@ -1,0 +1,559 @@
+<div class="page-body crm-dashboard">
+  <div class="row buy-sell-row" *ngIf="!isMobileView()" [dragula]='"bag-items"'>
+    <!-- Buy Sell cards start -->
+    <div *ngFor="let buySell of buySellData"
+         [ngClass]="{'request': buySell.onRequestClick}"
+         class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 buy-sell-col">
+      <div class="card buy-sell-card-main">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-3 col-md-3">
+              <label class="col-form-label float-left"><b [hidden]="buySell.ccyPair === 'USDEUR' ">EUR/USD</b></label>
+              <label class="col-form-label float-left"><b [hidden]="buySell.ccyPair === 'EURUSD'">USD/EUR</b></label>
+            </div>
+            <div class="col-1 col-md-1 p-l-0 rotate-currency-col">
+              <label class="col-form-label">
+                <i (click)="toggleRotateCurrency(buySell)" class="icofont icofont-exchange"></i>
+              </label>
+            </div>
+            <div class="col-4 col-md-4 p-l-0">
+              <select name="select" class="form-control form-control-inverse" [(ngModel)]="buySell.product">
+                <option value="Spot">Spot</option>
+                <option value="Swap">Swap</option>
+                <option value="TimeOption">Time Option</option>
+                <option value="Forward">Forward</option>
+              </select>
+            </div>
+            <div class="col-4 col-md-4">
+              <div class="buy-sell-actions float-right">
+                <a class="m-r-5">
+                  <i class="icofont icofont-tack-pin"></i>
+                </a>
+                <a (click)="closeBuySellCard($event, buySell.onPlusClick)">
+                  <i class="icofont icofont-close-line"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-block text-center">
+          <div class="row m-b-20">
+            <div class="col-3 col-md-3 p-r-0">
+              <select [(ngModel)]="buySell.buySellType" name="select"
+                      class="form-control form-control-inverse buy-sell-select">
+                <option value="B">Buy</option>
+                <option value="S">Sell</option>
+              </select>
+            </div>
+            <div class="col-3 col-md-3 p-r-0">
+              <button (click)="toggleCurrencyType(buySell)" [hidden]="buySell.ccySold === 'USD'"
+                      class="btn btn-inverse btn-outline-inverse btn-sm form-control form-control-inverse currency-type">
+                EUR
+              </button>
+              <button (click)="toggleCurrencyType(buySell)" [hidden]="buySell.ccySold === 'EUR'"
+                      class="btn btn-inverse btn-outline-inverse btn-sm form-control form-control-inverse currency-type">
+                USD
+              </button>
+            </div>
+            <div class="col-6 col-md-6 p-l-0">
+              <input type="number" class="form-control form-control-inverse currency-value buy-curr"
+                     placeholder="Enter Amount with only decimal allowed" [(ngModel)]="buySell.amountSold"
+                     (change)="onSoldAmountChange(buySell)"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4 col-md-4 p-r-0">
+              <label class="col-form-label float-left">Maturity Date</label>
+            </div>
+            <div class="col-2 col-md-2 p-r-0 p-l-0">
+              <select (change)="onDateOptionChange($event, buySell)"
+                      [(ngModel)]="buySell.maturityDateType"
+                      name="select" class="form-control form-control-inverse date-type">
+                <option value="O">O</option>
+                <option value="T">T</option>
+                <option value="S">S</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-6 p-l-0">
+              <div class="form-group">
+                <div class="input-group date-input-group m-l-0 row">
+                  <div class="col-9 col-md-9 p-r-0 p-l-0">
+                    <input class="form-control"
+                           [minDate]="{year: startYear, month: startMonth, day: startDate}"
+                           [maxDate]="{year: endYear, month: endMonth, day: endDate}"
+                           placeholder="yyyy-mm-dd" name="dp"
+                           (dateSelect)="onTradeDateSelect($event, buySell)"
+                           [(ngModel)]="buySell.maturityDate"
+                           ngbDatepicker #d="ngbDatepicker">
+                  </div>
+                  <div class="input-group-append col-2 col-md-2 p-l-0">
+                  <span class="input-group-text" (click)="d.toggle()">
+                    <i class="icofont icofont-ui-calendar"></i>
+                  </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row accounts-row m-b-10">
+            <div class="col-2 col-md-2">
+              <label class="col-form-label float-left">Debit</label>
+            </div>
+            <div class="col-10 col-md-10">
+              <select name="select" class="form-control form-control-inverse account-dropdown">
+                <option value="opt10">Accounts</option>
+                <option value="opt11">Account#001</option>
+                <option value="opt11">Account#002</option>
+                <option value="opt11">Account#003</option>
+              </select>
+            </div>
+
+          </div>
+          <div class="row accounts-row m-b-10 hidden-print ">
+            <div class="col-2 col-md-2">
+              <label class="col-form-label float-left">Credit</label>
+            </div>
+            <div class="col-10 col-md-10">
+              <select name="select" class="form-control form-control-inverse account-dropdown">
+                <option value="opt10">Accounts</option>
+                <option value="opt11">Account#001</option>
+                <option value="opt11">Account#002</option>
+                <option value="opt11">Account#003</option>
+              </select>
+            </div>
+          </div>
+          <div class="row divider"></div>
+          <div class="row request-row">
+            <button (click)="onRequestClick($event, buySell)"
+                    class="btn btn-success btn-outline-success ripple light m-l-10 m-r-20 req-btn">
+              Request
+            </button>
+          </div>
+          <div *ngIf="buySell.onRequestClick" class="row">
+            <div class="col-2 col-md-2"></div>
+            <div class="col-8 col-md-8">
+              <div class="">
+                <div class="card text-white" ngClass="{{buySell.buySellType==='B' ? 'bg-success' : 'bg-default'}}">
+                  <div class="card-block text-center">
+                    <h5 class="card-title">YOU {{buySell.buySellType === 'B' ? 'BUY': 'SELL'}}</h5>
+                    <div class="middle"><a class="f-24">{{buySell.tradeRateSmall}}</a>
+                      <a class="f-64"><b>{{buySell.tradeRateLarge}}</b></a></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-2 col-md-2"></div>
+          </div>
+          <div class="row" *ngIf="buySell.onRequestClick">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+              <div class="text-center m-b-20">
+                <p class="text-danger m-b-10">The time remaining is 0:17 seconds</p>
+                <h4 class="text-muted">{{buySell.buySellType === 'B' ? 'Sell': 'Buy'}} {{buySell.ccySold === 'USD' ?
+                  'EUR': 'USD'}} {{buySell.calculatedTrade}}</h4>
+              </div>
+            </div>
+            <div class="col-md-2"></div>
+          </div>
+          <div *ngIf="buySell.onRequestClick" class="row accept-reject-row">
+            <div class="col-sm-6 col-md-6">
+              <button (click)="onAcceptClick('effect-1')"
+                      class="btn btn-success btn-outline-success ripple light">
+                <i class="icofont icofont-check-circled"></i>
+                Accept
+              </button>
+            </div>
+            <div class="col-sm-6 col-md-6">
+              <button (click)="onDeclineClick($event, buySell)"
+                      class="btn btn-danger btn-outline-danger ripple light">
+                <i class="icofont icofont-close-line-circled "></i>
+                Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 buy-sell-col " [hidden]="plusClicked">
+      <div class="card buy-sell-card-add">
+        <div class="card-block align-items-center text-center">
+          <a (click)="onPlusClick($event)"><i class="icofont icofont-plus"></i></a>
+        </div>
+      </div>
+    </div>
+    <!-- Buy Sell cards end -->
+
+  </div>
+  <div class="row buy-sell-row" *ngIf="isMobileView()">
+    <!-- Buy Sell cards start -->
+    <div *ngFor="let buySell of buySellData"
+         [ngClass]="{'request': buySell.onRequestClick}"
+         class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 buy-sell-col">
+      <div class="card buy-sell-card-main">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-3 col-md-3">
+              <label class="col-form-label float-left"><b [hidden]="buySell.ccyPair === 'USDEUR' ">EUR/USD</b></label>
+              <label class="col-form-label float-left"><b [hidden]="buySell.ccyPair === 'EURUSD'">USD/EUR</b></label>
+            </div>
+            <div class="col-1 col-md-1 p-l-0 rotate-currency-col">
+              <label class="col-form-label">
+                <i (click)="toggleRotateCurrency(buySell)" class="icofont icofont-exchange"></i>
+              </label>
+            </div>
+            <div class="col-4 col-md-4 p-l-0">
+              <select name="select" class="form-control form-control-inverse" [(ngModel)]="buySell.product">
+                <option value="Spot">Spot</option>
+                <option value="Swap">Swap</option>
+                <option value="TimeOption">Time Option</option>
+                <option value="Forward">Forward</option>
+              </select>
+            </div>
+            <div class="col-4 col-md-4">
+              <div class="buy-sell-actions float-right">
+                <a class="m-r-5">
+                  <i class="icofont icofont-tack-pin"></i>
+                </a>
+                <a (click)="closeBuySellCard($event, buySell.onPlusClick)">
+                  <i class="icofont icofont-close-line"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-block text-center">
+          <div class="row m-b-20">
+            <div class="col-3 col-md-3 p-r-0">
+              <select [(ngModel)]="buySell.buySellType" name="select"
+                      class="form-control form-control-inverse buy-sell-select">
+                <option value="B">Buy</option>
+                <option value="S">Sell</option>
+              </select>
+            </div>
+            <div class="col-3 col-md-3 p-r-0">
+              <button (click)="toggleCurrencyType(buySell)" [hidden]="buySell.ccySold === 'USD'"
+                      class="btn btn-inverse btn-outline-inverse btn-sm form-control form-control-inverse currency-type">
+                EUR
+              </button>
+              <button (click)="toggleCurrencyType(buySell)" [hidden]="buySell.ccySold === 'EUR'"
+                      class="btn btn-inverse btn-outline-inverse btn-sm form-control form-control-inverse currency-type">
+                USD
+              </button>
+            </div>
+            <div class="col-6 col-md-6 p-l-0">
+              <input type="number" class="form-control form-control-inverse currency-value buy-curr"
+                     placeholder="Enter Amount with only decimal allowed" [(ngModel)]="buySell.amountSold"
+                     (change)="onSoldAmountChange(buySell)"/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4 col-md-4 p-r-0">
+              <label class="col-form-label float-left">Maturity Date</label>
+            </div>
+            <div class="col-2 col-md-2 p-r-0 p-l-0">
+              <select (change)="onDateOptionChange($event, buySell)"
+                      [(ngModel)]="buySell.maturityDateType"
+                      name="select" class="form-control form-control-inverse date-type">
+                <option value="O">O</option>
+                <option value="T">T</option>
+                <option value="S">S</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-6 p-l-0">
+              <div class="form-group">
+                <div class="input-group date-input-group m-l-0 row">
+                  <div class="col-9 col-md-9 p-r-0 p-l-0">
+                    <input class="form-control"
+                           [minDate]="{year: startYear, month: startMonth, day: startDate}"
+                           [maxDate]="{year: endYear, month: endMonth, day: endDate}"
+                           placeholder="yyyy-mm-dd" name="dp"
+                           (dateSelect)="onTradeDateSelect($event, buySell)"
+                           [(ngModel)]="buySell.maturityDate"
+                           ngbDatepicker #d="ngbDatepicker">
+                  </div>
+                  <div class="input-group-append col-2 col-md-2 p-l-0">
+                  <span class="input-group-text" (click)="d.toggle()">
+                    <i class="icofont icofont-ui-calendar"></i>
+                  </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row accounts-row m-b-10">
+            <div class="col-2 col-md-2">
+              <label class="col-form-label float-left">Debit</label>
+            </div>
+            <div class="col-10 col-md-10">
+              <select name="select" class="form-control form-control-inverse account-dropdown">
+                <option value="opt10">Accounts</option>
+                <option value="opt11">Account#001</option>
+                <option value="opt11">Account#002</option>
+                <option value="opt11">Account#003</option>
+              </select>
+            </div>
+
+          </div>
+          <div class="row accounts-row m-b-10 hidden-print ">
+            <div class="col-2 col-md-2">
+              <label class="col-form-label float-left">Credit</label>
+            </div>
+            <div class="col-10 col-md-10">
+              <select name="select" class="form-control form-control-inverse account-dropdown">
+                <option value="opt10">Accounts</option>
+                <option value="opt11">Account#001</option>
+                <option value="opt11">Account#002</option>
+                <option value="opt11">Account#003</option>
+              </select>
+            </div>
+          </div>
+          <div class="row divider"></div>
+          <div class="row request-row">
+            <button (click)="onRequestClick($event, buySell)"
+                    class="btn btn-success btn-outline-success ripple light m-l-10 m-r-20 req-btn">
+              Request
+            </button>
+          </div>
+          <div *ngIf="buySell.onRequestClick" class="row">
+            <div class="col-2 col-md-2"></div>
+            <div class="col-8 col-md-8">
+              <div class="">
+                <div class="card text-white" ngClass="{{buySell.buySellType==='B' ? 'bg-success' : 'bg-default'}}">
+                  <div class="card-block text-center">
+                    <h5 class="card-title">YOU {{buySell.buySellType === 'B' ? 'BUY': 'SELL'}}</h5>
+                    <div class="middle"><a class="f-24">{{buySell.tradeRateSmall}}</a>
+                      <a class="f-64"><b>{{buySell.tradeRateLarge}}</b></a></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-2 col-md-2"></div>
+          </div>
+          <div class="row" *ngIf="buySell.onRequestClick">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+              <div class="text-center m-b-20">
+                <p class="text-danger m-b-10">The time remaining is 0:17 seconds</p>
+                <h4 class="text-muted">{{buySell.buySellType === 'B' ? 'Sell': 'Buy'}} {{buySell.ccySold === 'USD' ?
+                  'EUR': 'USD'}} {{buySell.calculatedTrade}}</h4>
+              </div>
+            </div>
+            <div class="col-md-2"></div>
+          </div>
+          <div *ngIf="buySell.onRequestClick" class="row accept-reject-row">
+            <div class="col-sm-6 col-md-6">
+              <button (click)="onAcceptClick('effect-1')"
+                      class="btn btn-success btn-outline-success ripple light">
+                <i class="icofont icofont-check-circled"></i>
+                Accept
+              </button>
+            </div>
+            <div class="col-sm-6 col-md-6">
+              <button (click)="onDeclineClick($event, buySell)"
+                      class="btn btn-danger btn-outline-danger ripple light">
+                <i class="icofont icofont-close-line-circled "></i>
+                Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 buy-sell-col " [hidden]="plusClicked">
+      <div class="card buy-sell-card-add">
+        <div class="card-block align-items-center text-center">
+          <a (click)="onPlusClick($event)"><i class="icofont icofont-plus"></i></a>
+        </div>
+      </div>
+    </div>
+    <!-- Buy Sell cards end -->
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <app-card [cardClass]="'tab-card'">
+        <div class="md-tabs">
+          <ngb-tabset (tabChange)="onClickTab()">
+            <ngb-tab title="Blotter">
+              <ng-template ngbTabContent>
+                <app-card [title]="" [classHeader]="true">
+                  <div class="row">
+                    <div class="col-3 col-sm-1 p-r-0">
+                      <label class="p-r-10 filter-on-mob p-t-5">Filter: </label>
+                    </div>
+                    <div class="col-7 col-sm-2 p-l-0 m-b-10">
+                      <select name="select" class="form-control form-control-inverse">
+                        <option value="MyTrades">My Trades</option>
+                        <option value="AllTrades">All Trades</option>
+                      </select>
+                    </div>
+                    <div class="col-2 col-sm-6"></div>
+                    <div class="col-3 col-sm-1 p-r-0">
+                      <label class="p-t-5">Search: </label>
+                    </div>
+                    <div class="col-7 col-sm-2 p-l-0">
+                      <div class="form-group">
+                        <input
+                          type='text'
+                          class="form-control input-sm"
+                          placeholder='Search Name'
+                          (keyup)='updateFilter($event)'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <ngx-datatable
+                    #table
+                    class='data-table'
+                    [columns]="columns"
+                    [columnMode]="'force'"
+                    [scrollbarH]="true"
+                    [headerHeight]="50"
+                    [footerHeight]="50"
+                    [rowHeight]="50"
+                    [rowClass]="getRowClass"
+                    [limit]="6"
+                    [rows]='rowsFilter'>
+                  </ngx-datatable>
+                </app-card>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Trade Search">
+              <ng-template ngbTabContent>
+                <ngx-datatable
+                  #table
+                  class='data-table'
+                  [columns]="tradeColumns"
+                  [columnMode]="'force'"
+                  [scrollbarH]="true"
+                  [headerHeight]="50"
+                  [footerHeight]="50"
+                  [rowHeight]="50"
+                  [rowClass]="getRowClass"
+                  [limit]="6"
+                  [rows]='rowsTradeFilter'>
+                </ngx-datatable>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+      </app-card>
+
+
+    </div>
+
+  </div>
+  <div class="row">
+    <h4 class="p-l-15 p-b-15">Reports</h4>
+  </div>
+  <div class="row">
+    <div class="col-md-6 col-xl-6">
+      <app-card [title]="'Currency Split'"
+                [headerContent]="'Lorem ipsum dolor sit amet, consectetur adipisicing elit'"
+                style="width: 100%; height: 250px;">
+        <google-chart [data]="donutChartData"></google-chart>
+      </app-card>
+    </div>
+    <div class="col-md-6 col-xl-6">
+      <app-card [title]="'Net Exposure By Month'"
+                [headerContent]="'Lorem ipsum dolor sit amet, consectetur adipisicing elit'">
+        <div style="width: 100%; height: 298px;">
+          <div id="chart1" style="width: 100%; height: 228px;">
+
+          </div>
+        </div>
+      </app-card>
+    </div>
+  </div>
+
+  <!--start of modals-->
+  <app-modal-animation [modalID]="'effect-1'" [modalClass]="'md-effect-1 plus-modal'">
+    <div class="card">
+      <div class="card-block text-center">
+        <div class="row">
+          <button class="btn btn-success ripple light req-btn">
+            Booked Deal Number {{dealNo}}
+          </button>
+        </div>
+
+        <div class="row divider">
+        </div>
+        <dl class="dl-horizontal row">
+          <dt class="col-sm-6">Entity</dt>
+          <dd class="col-sm-6">Blackstone Solar</dd>
+          <dt class="col-sm-3 col-md-6 m-t-0">
+            <label class="col-form-label credit-label">You Sold</label><br/>
+            EUR 10,000
+          </dt>
+          <dd class="col-xs-6 col-sm-9 col-md-6">
+            <div class="row">
+              <div class="col-3 col-md-3">
+                <label class="col-form-label debit-label">Debit</label>
+              </div>
+              <div class="col-9 col-md-9">
+                <select (change)="onDebitChange($event)"
+                        name="select" class="form-control form-control-inverse accounts-dropdown"
+                        [(ngModel)]="selectedDebitAccount">
+                  <option value="Accounts">Accounts</option>
+                  <option value="opt11">Account#001</option>
+                  <option value="opt11">Account#002</option>
+                  <option value="opt11">Account#003</option>
+                </select>
+              </div>
+            </div>
+          </dd>
+          <dt class="col-xs-6 col-sm-3 col-md-6 m-t-0">
+            <label class="col-form-label credit-label">You Bought</label><br/>
+            USD 10,000
+          </dt>
+          <dd class="col-xs-6 col-sm-9 col-md-6">
+            <div class="row">
+              <div class="col-3 col-md-3">
+                <label class="col-form-label credit-label">Credit</label>
+              </div>
+              <div class="col-9 col-md-9">
+                <select (change)="onCreditChange($event)"
+                        name="select" class="form-control form-control-inverse accounts-dropdown"
+                        [(ngModel)]="selectedCreditAccount">
+                  <option value="Accounts">Accounts</option>
+                  <option value="opt11">Account#001</option>
+                  <option value="opt11">Account#002</option>
+                  <option value="opt11">Account#003</option>
+                </select>
+              </div>
+            </div>
+          </dd>
+          <dt class="col-xs-6 col-sm-6">Trade Rate</dt>
+          <dd class="col-xs-6 col-sm-6">1.1038</dd>
+          <dt class="col-xs-6 col-sm-6">Maturity Date</dt>
+          <dd class="col-xs-6 col-sm-6">23rd November 18</dd>
+          <dt class="col-xs-6 col-sm-6 col-sm-offset-3">Trade Date & Time</dt>
+          <dd class="col-xs-6 col-sm-6">{{tradeDate}}</dd>
+          <dt class="col-xs-6 col-sm-6">Product</dt>
+          <dd class="col-xs-6 col-sm-6 text-truncate">Spot</dd>
+        </dl>
+        <div class="row confirm-close-row">
+          <div class="col-sm-2 print-col">
+            <i class="icofont icofont-print"></i>
+          </div>
+          <div class="col-sm-5">
+            <button (click)="onConfirmClick($event)"
+                    class="btn btn-success btn-outline-success ripple light m-r-20">
+              {{confirmButtonText}}
+            </button>
+          </div>
+          <div class="col-sm-5">
+            <button (click)="closeMyModal($event)"
+                    class="btn btn-danger btn-outline-danger ripple light">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </app-modal-animation>
+  <!--end of modals-->
+</div>
+<ng2-toasty [position]="position"></ng2-toasty>
+
+
